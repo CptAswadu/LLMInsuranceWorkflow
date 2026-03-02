@@ -277,118 +277,118 @@ def get_answers(sample_patient_dict):
         }    
     } 
 
-# random.seed(42)
+random.seed(42)
 
-# number_of_samples = 20000  # Number of sample patients to generate
-# idx = 0 # initial index
-# samples = [] # empty list to store sample patients
-# # Generate sample patients
-# while idx < number_of_samples:
-#     case_id = f"Case{idx + 1}"  # starting form 1, make case_id
-#     age_years, age_string = generate_age_in_category(random.choice(age_categories))
-#     sample_patient = {
-#         "case_id": case_id,
-#         "insurance": random.choice(insurance_options),
-#         "genetic_tests": random.choice(test_options),
-#         "age_years": age_years,
-#         "age_string": age_string,
-#         "order_provider": random.choice(order_providers_options),
-#         "clinical_indication": random.choice(q3_merged['Indication']),
-#         "prior_testing": random.choice(prior_testing_options),  
-#         "family_history": random.choice(q5_merged['Family history']),
-#         "genetic_counselor": random.choice(genetic_counselor_options),
-#         "cpt_code": random.choice(cpt_codes_options)
-#     }
+number_of_samples = 20000  # Number of sample patients to generate
+idx = 0 # initial index
+samples = [] # empty list to store sample patients
+# Generate sample patients
+while idx < number_of_samples:
+    case_id = f"Case{idx + 1}"  # starting form 1, make case_id
+    age_years, age_string = generate_age_in_category(random.choice(age_categories))
+    sample_patient = {
+        "case_id": case_id,
+        "insurance": random.choice(insurance_options),
+        "genetic_tests": random.choice(test_options),
+        "age_years": age_years,
+        "age_string": age_string,
+        "order_provider": random.choice(order_providers_options),
+        "clinical_indication": random.choice(q3_merged['Indication']),
+        "prior_testing": random.choice(prior_testing_options),  
+        "family_history": random.choice(q5_merged['Family history']),
+        "genetic_counselor": random.choice(genetic_counselor_options),
+        "cpt_code": random.choice(cpt_codes_options)
+    }
     
-#     answer = get_answers(sample_patient)
-#     samples.append(answer)
-#     idx += 1
+    answer = get_answers(sample_patient)
+    samples.append(answer)
+    idx += 1
 
 dataset_dir = '/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/dataset'
-# if not os.path.exists(dataset_dir):
-#     os.makedirs(dataset_dir)
-# with open(f'{dataset_dir}/samples.json', 'w') as f:
-#     json.dump(samples, f, indent=4)
+if not os.path.exists(dataset_dir):
+    os.makedirs(dataset_dir)
+with open(f'{dataset_dir}/samples.json', 'w') as f:
+    json.dump(samples, f, indent=4)
 
-# def negative_sample_balanced_dataset(realistic_samples, target_size, test_proportions=None):
-#     test_groups = defaultdict(list)
-#     for s in realistic_samples:
-#         case_data = list(s.values())[0]
-#         test_name = case_data["Q0"]
-#         test_groups[test_name].append(s)
+def negative_sample_balanced_dataset(realistic_samples, target_size, test_proportions=None):
+    test_groups = defaultdict(list)
+    for s in realistic_samples:
+        case_data = list(s.values())[0]
+        test_name = case_data["Q0"]
+        test_groups[test_name].append(s)
 
-#     test_counts = {test: len(group) for test, group in test_groups.items()}
-#     total_realistic = sum(test_counts.values())
+    test_counts = {test: len(group) for test, group in test_groups.items()}
+    total_realistic = sum(test_counts.values())
     
-#     if test_proportions is None:
-#         test_proportions = {test: count/total_realistic for test, count in test_counts.items()}
+    if test_proportions is None:
+        test_proportions = {test: count/total_realistic for test, count in test_counts.items()}
 
-#     balanced_samples = []
-#     count_yes = sum(1 for s in realistic_samples for case_data in s.values() if case_data["Q8"] == "Yes")
-#     p_q8_yes = count_yes / len(realistic_samples) if len(realistic_samples) > 0 else 0
+    balanced_samples = []
+    count_yes = sum(1 for s in realistic_samples for case_data in s.values() if case_data["Q8"] == "Yes")
+    p_q8_yes = count_yes / len(realistic_samples) if len(realistic_samples) > 0 else 0
     
-#     def _compute_q8_weight(sample, p_q8_yes, epsilon=1e-6):
-#         case_data = list(sample.values())[0]
-#         if case_data["Q8"] == "Yes":
-#             return 1 / (p_q8_yes + epsilon)
-#         else:
-#             return 1 / (1 - p_q8_yes + epsilon)
+    def _compute_q8_weight(sample, p_q8_yes, epsilon=1e-6):
+        case_data = list(sample.values())[0]
+        if case_data["Q8"] == "Yes":
+            return 1 / (p_q8_yes + epsilon)
+        else:
+            return 1 / (1 - p_q8_yes + epsilon)
     
-#     def _weighted_sample_without_replacement(population, weights, k):
-#         if k >= len(population):
-#             return population.copy()
+    def _weighted_sample_without_replacement(population, weights, k):
+        if k >= len(population):
+            return population.copy()
         
-#         selected = []
-#         remaining_pop = population.copy()
-#         remaining_weights = weights.copy()
+        selected = []
+        remaining_pop = population.copy()
+        remaining_weights = weights.copy()
         
-#         for _ in range(k):
-#             total_weight = sum(remaining_weights)
-#             probabilities = [w / total_weight for w in remaining_weights]
-#             chosen_idx = random.choices(range(len(remaining_pop)), weights=probabilities, k=1)[0]
-#             selected.append(remaining_pop.pop(chosen_idx))
-#             remaining_weights.pop(chosen_idx)
+        for _ in range(k):
+            total_weight = sum(remaining_weights)
+            probabilities = [w / total_weight for w in remaining_weights]
+            chosen_idx = random.choices(range(len(remaining_pop)), weights=probabilities, k=1)[0]
+            selected.append(remaining_pop.pop(chosen_idx))
+            remaining_weights.pop(chosen_idx)
         
-#         return selected
+        return selected
     
-#     for test, proportion in test_proportions.items():
-#         test_group = test_groups.get(test, [])
-#         if not test_group:
-#             continue
+    for test, proportion in test_proportions.items():
+        test_group = test_groups.get(test, [])
+        if not test_group:
+            continue
 
-#         weights = [_compute_q8_weight(s, p_q8_yes) for s in test_group]
-#         k = int(target_size * proportion)
-#         k = min(k, len(test_group))
+        weights = [_compute_q8_weight(s, p_q8_yes) for s in test_group]
+        k = int(target_size * proportion)
+        k = min(k, len(test_group))
 
-#         selected = _weighted_sample_without_replacement(test_group, weights, k)
-#         balanced_samples.extend(selected)
+        selected = _weighted_sample_without_replacement(test_group, weights, k)
+        balanced_samples.extend(selected)
     
-#     print(f"Actual sampled: {len(balanced_samples)}")
-#     return balanced_samples
+    print(f"Actual sampled: {len(balanced_samples)}")
+    return balanced_samples
 
-# test_ratios = {
-#     "WES": 0.4,
-#     "WGS": 0.2,
-#     "BRCA1/2": 0.3,
-#     "CMA": 0.1
-# }
+test_ratios = {
+    "WES": 0.4,
+    "WGS": 0.2,
+    "BRCA1/2": 0.3,
+    "CMA": 0.1
+}
 
-# balanced_samples = negative_sample_balanced_dataset(samples, target_size=200, test_proportions=test_ratios)
+balanced_samples = negative_sample_balanced_dataset(samples, target_size=200, test_proportions=test_ratios)
 
 # # Save the balanced samples to a JSON file
 dataset_dir = '/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/dataset'
-# if not os.path.exists(dataset_dir):
-#     os.makedirs(dataset_dir)
-# with open(f'{dataset_dir}/balanced_samples.json', 'w') as f:
-#     json.dump(balanced_samples, f, indent=4)
+if not os.path.exists(dataset_dir):
+    os.makedirs(dataset_dir)
+with open(f'{dataset_dir}/balanced_samples.json', 'w') as f:
+    json.dump(balanced_samples, f, indent=4)
 
-# # Check q8 balance
-# def print_q8_balance(dataset):
-#     total = len(dataset)
-#     yes = sum(1 for s in dataset for case_data in s.values() if case_data["Q8"] == "Yes")
-#     print(f"Q8 Yes: {yes/total:.2f}, No: {(total - yes)/total:.2f}")
+# Check q8 balance
+def print_q8_balance(dataset):
+    total = len(dataset)
+    yes = sum(1 for s in dataset for case_data in s.values() if case_data["Q8"] == "Yes")
+    print(f"Q8 Yes: {yes/total:.2f}, No: {(total - yes)/total:.2f}")
 
-# print_q8_balance(balanced_samples)
+print_q8_balance(balanced_samples)
 
 def evaluate_and_generate(sample_patient_dict, model="gpt-5-nano"):
     """
@@ -542,117 +542,115 @@ def evaluate_and_generate_multiple(sample_patient_dict, model="gpt-5-mini", num_
     
     return all_realistic, final_content, results[0]['genetic_tests'], results
 
-# # List of models to use
-# models = ["gpt-5-mini"]
+# List of models to use
+models = ["gpt-5-mini"]
 
-# for model_name in models:
-#     print(f"\n=== Processing with {model_name} (3 sets of 200 samples) ===")
+for model_name in models:
+    print(f"\n=== Processing with {model_name} (3 sets of 200 samples) ===")
     
-#     # 각 세트별 결과를 저장할 딕셔너리
-#     all_results = {}
+    all_results = {}
     
-#     # 3번의 세트 실행
-#     for run_set in range(3):
-#         print(f"\n--- Run Set {run_set + 1}/3 ---")
+    # execute 3 sets of evaluation and generation
+    for run_set in range(3):
+        print(f"\n--- Run Set {run_set + 1}/3 ---")
         
-#         for sample_dict in balanced_samples:
-#             case_data = list(sample_dict.values())[0]
-#             patient_dict = case_data["sample_patient_dict"]
-#             case_id = patient_dict.get('case_id', 'Unknown')
-#             print(f"Processing {case_id} (Set {run_set + 1})")
+        for sample_dict in balanced_samples:
+            case_data = list(sample_dict.values())[0]
+            patient_dict = case_data["sample_patient_dict"]
+            case_id = patient_dict.get('case_id', 'Unknown')
+            print(f"Processing {case_id} (Set {run_set + 1})")
             
-#             realistic, content, genetic_tests = evaluate_and_generate(patient_dict, model_name)
+            realistic, content, genetic_tests = evaluate_and_generate(patient_dict, model_name)
             
-#             # 결과 저장 구조 초기화
-#             if case_id not in all_results:
-#                 all_results[case_id] = {
-#                     'genetic_tests': genetic_tests,
-#                     'runs': []
-#                 }
+            if case_id not in all_results:
+                all_results[case_id] = {
+                    'genetic_tests': genetic_tests,
+                    'runs': []
+                }
             
-#             # 해당 세트 결과 추가
-#             all_results[case_id]['runs'].append({
-#                 'realistic': realistic,
-#                 'content': content
-#             })
+            # Add the result of the current set
+            all_results[case_id]['runs'].append({
+                'realistic': realistic,
+                'content': content
+            })
     
-#     # 각 케이스별로 3번 결과 분석
-#     final_results = {}
-#     for case_id, data in all_results.items():
-#         runs = data['runs']
-#         all_realistic = all(run['realistic'] for run in runs)
+    # analysis and final result compilation
+    final_results = {}
+    for case_id, data in all_results.items():
+        runs = data['runs']
+        all_realistic = all(run['realistic'] for run in runs)
         
-#         # 첫 번째 realistic content 찾기
-#         final_content = ""
-#         for run in runs:
-#             if run['realistic']:
-#                 final_content = run['content']
-#                 break
-#         if not final_content:
-#             final_content = runs[0]['content']
+        # realistic content search
+        final_content = ""
+        for run in runs:
+            if run['realistic']:
+                final_content = run['content']
+                break
+        if not final_content:
+            final_content = runs[0]['content']
         
-#         final_results[case_id] = {
-#             'realistic_all_3': all_realistic,
-#             'genetic_tests': data['genetic_tests'],
-#             'text': final_content,
-#             'run_details': runs
-#         }
+        final_results[case_id] = {
+            'realistic_all_3': all_realistic,
+            'genetic_tests': data['genetic_tests'],
+            'text': final_content,
+            'run_details': runs
+        }
 
-#     # Include model name in filename
-#     model_safe_name = model_name.replace("-", "_")
-#     save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"
+    # Include model name in filename
+    model_safe_name = model_name.replace("-", "_")
+    save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"
     
-#     # Save results to CSV file
-#     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-#     with open(save_path, 'w', newline='', encoding='utf-8') as f:
-#         writer = csv.writer(f)
-#         writer.writerow(['case_id', 'genetic_tests', 'realistic_all_3', 'text', 'run1_realistic', 'run2_realistic', 'run3_realistic'])
-#         for case_id, data in final_results.items():
-#             run_results = [str(run['realistic']) for run in data['run_details']]
-#             writer.writerow([
-#                 case_id, 
-#                 data['genetic_tests'], 
-#                 data['realistic_all_3'], 
-#                 data['text']
-#             ] + run_results)
+    # Save results to CSV file
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    with open(save_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['case_id', 'genetic_tests', 'realistic_all_3', 'text', 'run1_realistic', 'run2_realistic', 'run3_realistic'])
+        for case_id, data in final_results.items():
+            run_results = [str(run['realistic']) for run in data['run_details']]
+            writer.writerow([
+                case_id, 
+                data['genetic_tests'], 
+                data['realistic_all_3'], 
+                data['text']
+            ] + run_results)
     
-#     print(f"Results saved to {save_path}")
+    print(f"Results saved to {save_path}")
 
-#     # Save raw results (all_results) to CSV file
-#     raw_results_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/raw_results_3sets_{model_safe_name}_200.csv"
+    # Save raw results (all_results) to CSV file
+    raw_results_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/raw_results_3sets_{model_safe_name}_200.csv"
     
-#     with open(raw_results_path, 'w', newline='', encoding='utf-8') as f:
-#         writer = csv.writer(f)
-#         writer.writerow(['case_id', 'genetic_tests', 'set_number', 'realistic', 'content'])
+    with open(raw_results_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['case_id', 'genetic_tests', 'set_number', 'realistic', 'content'])
         
-#         for case_id, data in all_results.items():
-#             for i, run in enumerate(data['runs'], 1):
-#                 writer.writerow([
-#                     case_id,
-#                     data['genetic_tests'],
-#                     f"Set {i}",
-#                     run['realistic'],
-#                     run['content']
-#                 ])
+        for case_id, data in all_results.items():
+            for i, run in enumerate(data['runs'], 1):
+                writer.writerow([
+                    case_id,
+                    data['genetic_tests'],
+                    f"Set {i}",
+                    run['realistic'],
+                    run['content']
+                ])
     
-#     print(f"Raw results saved to {raw_results_path}")
+    print(f"Raw results saved to {raw_results_path}")
 
-#     # Count cases where all 3 runs are realistic
-#     all_realistic_count = sum(1 for data in final_results.values() if data['realistic_all_3'])
-#     total_count = len(final_results)
+    # Count cases where all 3 runs are realistic
+    all_realistic_count = sum(1 for data in final_results.values() if data['realistic_all_3'])
+    total_count = len(final_results)
     
-#     print(f"All 3 sets realistic: {all_realistic_count}/{total_count}")
+    print(f"All 3 sets realistic: {all_realistic_count}/{total_count}")
     
-#     # Append count information to existing CSV file
-#     with open(save_path, 'a', newline='', encoding='utf-8') as f:
-#         writer = csv.writer(f)
-#         writer.writerow([])  # Empty row
-#         writer.writerow(['Summary', '', '', '', '', '', ''])
-#         writer.writerow(['Total cases', total_count, '', '', '', '', ''])
-#         writer.writerow(['All 3 sets realistic', all_realistic_count, '', '', '', '', ''])
-#         writer.writerow(['All 3 sets realistic percentage', f"{all_realistic_count/total_count*100:.1f}%", '', '', '', '', ''])
+    # Append count information to existing CSV file
+    with open(save_path, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([])  # Empty row
+        writer.writerow(['Summary', '', '', '', '', '', ''])
+        writer.writerow(['Total cases', total_count, '', '', '', '', ''])
+        writer.writerow(['All 3 sets realistic', all_realistic_count, '', '', '', '', ''])
+        writer.writerow(['All 3 sets realistic percentage', f"{all_realistic_count/total_count*100:.1f}%", '', '', '', '', ''])
 
-# print("\n=== All models processing completed ===")
+print("\n=== All models processing completed ===")
 
 
 def filter_realistic_samples(balanced_samples, csv_file_path):
@@ -675,24 +673,24 @@ def filter_realistic_samples(balanced_samples, csv_file_path):
     print(f"✅ Filtered to {len(filtered_samples)} samples (all 3 runs realistic)")
     return filtered_samples
 
-# # 각 모델별로 realistic 샘플 필터링 및 저장
-# models = ["gpt-5-mini"]  # 현재 한 모델만 사용하는 것 같으니 맞춰서 수정
+# realistic sample filtering and store
+models = ["gpt-5-mini"]  
 
-# for model_name in models:
-#     model_safe_name = model_name.replace("-", "_")
-#     csv_file_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"  # 3runs 추가
+for model_name in models:
+    model_safe_name = model_name.replace("-", "_")
+    csv_file_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"  # 3runs 추가
     
-#     print(f"\n=== Filtering realistic samples for {model_name} (3 runs all True) ===")
-#     realistic_samples = filter_realistic_samples(balanced_samples, csv_file_path)
+    print(f"\n=== Filtering realistic samples for {model_name} (3 runs all True) ===")
+    realistic_samples = filter_realistic_samples(balanced_samples, csv_file_path)
     
-#     # 각 모델별로 realistic 샘플 저장
-#     realistic_save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_samples_3sets_{model_safe_name}_200.json"  # 3runs 추가
-#     with open(realistic_save_path, 'w') as f:
-#         json.dump(realistic_samples, f, indent=4)
+    # sample store
+    realistic_save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_samples_3sets_{model_safe_name}_200.json"  # 3runs 추가
+    with open(realistic_save_path, 'w') as f:
+        json.dump(realistic_samples, f, indent=4)
     
-#     print(f"💾 Realistic samples (all 3 runs True) saved to {realistic_save_path}")
+    print(f"💾 Realistic samples (all 3 runs True) saved to {realistic_save_path}")
 
-# print("\n=== All realistic sample filtering completed ===")
+print("\n=== All realistic sample filtering completed ===")
 
 
 def create_final_freetext_samples(realistic_samples, csv_file_path):
@@ -712,24 +710,24 @@ def create_final_freetext_samples(realistic_samples, csv_file_path):
     
     return llm_samples
 
-# models = ["gpt-5-mini"]  
+models = ["gpt-5-mini"]  
 
-# for model_name in models:
-#     model_safe_name = model_name.replace("-", "_")
-#     csv_file_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"  # 3sets 추가
+for model_name in models:
+    model_safe_name = model_name.replace("-", "_")
+    csv_file_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/realistic_results_3sets_{model_safe_name}_200.csv"  # 3sets 추가
 
-#     print(f"\n=== Creating final freetext samples for {model_name} (from 3 sets) ===")
+    print(f"\n=== Creating final freetext samples for {model_name} (from 3 sets) ===")
 
-#     final_samples = create_final_freetext_samples(realistic_samples, csv_file_path)
+    final_samples = create_final_freetext_samples(realistic_samples, csv_file_path)
 
-#     # 각 모델별로 final 샘플 저장
-#     final_save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/final_freetext_samples_3sets_{model_safe_name}_200.json"  # 3runs 추가
-#     with open(final_save_path, 'w') as f:
-#         json.dump(final_samples, f, indent=4)
+    # final sample store
+    final_save_path = f"/home/cptaswadu/new-rescue/RESCUE-n8n/eval/insurance/results/LLM_QnA/final_freetext_samples_3sets_{model_safe_name}_200.json"  # 3runs 추가
+    with open(final_save_path, 'w') as f:
+        json.dump(final_samples, f, indent=4)
     
-#     print(f"💾 Final freetext samples ({len(final_samples)}) saved to {final_save_path}")
+    print(f"💾 Final freetext samples ({len(final_samples)}) saved to {final_save_path}")
 
-# print("\n=== All final freetext sample creation completed ===")
+print("\n=== All final freetext sample creation completed ===")
 
 
 def remove_cases_from_files(ground_truth_path, freetext_path, cases_to_remove):
