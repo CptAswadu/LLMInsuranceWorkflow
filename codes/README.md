@@ -50,6 +50,9 @@ For tasks that require policy documents (Policy Retrieval Assessment, Patient–
 
 - The scripts expect a local directory containing the policy documents.
 - Please update the policy document directory path in the corresponding scripts before execution.  
+- Policy documents are not distributed in this repository.  
+  Multiple document sets were used in the experiments (full corpus, retrieval subset, and a small test set for pipeline verification).  
+  Please contact **Dr. Cong Liu (Cong.Liu@childrens.harvard.edu)** if access to the collected policy corpus is required.  
 ---  
 
 ## 🔹 SentenceTransformer Model Download

@@ -113,7 +113,18 @@ The 'Baseline' setting (patient narrative only, without policy documents) can be
 
 A total of 789 publicly available genetic testing policy documents were used for embedding and retrieval experiments.
 
-These documents are not redistributed in this repository due to size and licensing considerations.
+These documents are not redistributed in this repository due to size and licensing considerations.  
+
+In this study, three different document sets were used for different evaluation tasks:  
+
+- **insurance_policy/**  
+  Full corpus (789 documents) used for the main embedding and retrieval experiments.  
+
+- **insurance_ret/**  
+  A subset of the corpus used for the policy document retrieval evaluation.  
+
+- **insurance_answer/**  
+  A small document set used only for testing and debugging the patient–policy match and LLM QA tasks.  
 
 Please send email to Dr.Cong Liu if you want to get access to collected policy documents (Cong.Liu@childrens.harvard.edu)
 
