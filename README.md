@@ -21,7 +21,7 @@
 1. Clone the repository
 ```bash
 git clone https://github.com/CptAswadu/LLMInsuranceWorkflow
-cd Evaluating-Large-Language-Model-Agents-for-Genetic-Testing-Insurance-Workflows
+cd LLMInsuranceWorkflow
 ```
 
 2. Install dependencies
