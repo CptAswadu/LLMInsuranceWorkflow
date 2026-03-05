@@ -163,6 +163,5 @@ Key contributions:
   eprint       = {arXiv:XXXX.XXXXX},
   archivePrefix= {arXiv},
   primaryClass = {cs.CL},
-  institution  = {Boston Children's Hospital and Harvard Medical School}
 }
 
